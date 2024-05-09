@@ -1,457 +1,409 @@
-/**
-* SUIEA
-* Authors: 
-*/
-(function() {
-  "use strict";
-
-  /**
-   * Easy selector helper function
-   */
-  const select = (el, all = false) => {
-    el = el.trim()
-    if (all) {
-      return [...document.querySelectorAll(el)]
-    } else {
-      return document.querySelector(el)
-    }
-  }
-
-  /**
-   * Easy event listener function
-   */
-  const on = (type, el, listener, all = false) => {
-    if (all) {
-      select(el, all).forEach(e => e.addEventListener(type, listener))
-    } else {
-      select(el, all).addEventListener(type, listener)
-    }
-  }
-
-  /**
-   * Easy on scroll event listener 
-   */
-  const onscroll = (el, listener) => {
-    el.addEventListener('scroll', listener)
-  }
-
-  /**
-   * Sidebar toggle
-   */
-  if (select('.toggle-sidebar-btn')) {
-    on('click', '.toggle-sidebar-btn', function(e) {
-      select('body').classList.toggle('toggle-sidebar')
-    })
-  }
-
-  /**
-   * Search bar toggle
-   */
-  if (select('.search-bar-toggle')) {
-    on('click', '.search-bar-toggle', function(e) {
-      select('.search-bar').classList.toggle('search-bar-show')
-    })
-  }
-
-  /**
-   * Navbar links active state on scroll
-   */
-  let navbarlinks = select('#navbar .scrollto', true)
-  const navbarlinksActive = () => {
-    let position = window.scrollY + 200
-    navbarlinks.forEach(navbarlink => {
-      if (!navbarlink.hash) return
-      let section = select(navbarlink.hash)
-      if (!section) return
-      if (position >= section.offsetTop && position <= (section.offsetTop + section.offsetHeight)) {
-        navbarlink.classList.add('active')
-      } else {
-        navbarlink.classList.remove('active')
-      }
-    })
-  }
-  window.addEventListener('load', navbarlinksActive)
-  onscroll(document, navbarlinksActive)
-
-  /**
-   * Toggle .header-scrolled class to #header when page is scrolled
-   */
-  let selectHeader = select('#header')
-  if (selectHeader) {
-    const headerScrolled = () => {
-      if (window.scrollY > 100) {
-        selectHeader.classList.add('header-scrolled')
-      } else {
-        selectHeader.classList.remove('header-scrolled')
-      }
-    }
-    window.addEventListener('load', headerScrolled)
-    onscroll(document, headerScrolled)
-  }
-
-  /**
-   * Back to top button
-   */
-  let backtotop = select('.back-to-top')
-  if (backtotop) {
-    const toggleBacktotop = () => {
-      if (window.scrollY > 100) {
-        backtotop.classList.add('active')
-      } else {
-        backtotop.classList.remove('active')
-      }
-    }
-    window.addEventListener('load', toggleBacktotop)
-    onscroll(document, toggleBacktotop)
-  }
-
-
-  /*====================
-    Preloader JS
-  ======================*/
-  let preloader = select('.preloader')
-  window.addEventListener('load', function (){
-    preloader.classList.add('preloader-deactivate');
-  });
-
-  /**
-   * Initiate tooltips
-   */
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-
-  /**
-   * Initiate quill editors
-   */
-  if (select('.quill-editor-default')) {
-    new Quill('.quill-editor-default', {
-      theme: 'snow'
-    });
-  }
-
-  if (select('.quill-editor-bubble')) {
-    new Quill('.quill-editor-bubble', {
-      theme: 'bubble'
-    });
-  }
-
-  if (select('.quill-editor-full')) {
-    new Quill(".quill-editor-full", {
-      modules: {
-        toolbar: [
-          [{
-            font: []
-          }, {
-            size: []
-          }],
-          ["bold", "italic", "underline", "strike"],
-          [{
-              color: []
-            },
-            {
-              background: []
-            }
-          ],
-          [{
-              script: "super"
-            },
-            {
-              script: "sub"
-            }
-          ],
-          [{
-              list: "ordered"
-            },
-            {
-              list: "bullet"
-            },
-            {
-              indent: "-1"
-            },
-            {
-              indent: "+1"
-            }
-          ],
-          ["direction", {
-            align: []
-          }],
-          ["link", "image", "video"],
-          ["clean"]
-        ]
-      },
-      theme: "snow"
-    });
-  }
-
-  /**
-   * Initiate TinyMCE Editor
-   */
-  const useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
-
-  tinymce.init({
-    selector: 'textarea.tinymce-editor',
-    plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
-    editimage_cors_hosts: ['picsum.photos'],
-    menubar: 'file edit view insert format tools table help',
-    toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
-    toolbar_sticky: true,
-    toolbar_sticky_offset: isSmallScreen ? 102 : 108,
-    autosave_ask_before_unload: true,
-    autosave_interval: '30s',
-    autosave_prefix: '{path}{query}-{id}-',
-    autosave_restore_when_empty: false,
-    autosave_retention: '2m',
-    image_advtab: true,
-    link_list: [{
-        title: 'My page 1',
-        value: 'https://www.tiny.cloud'
-      },
-      {
-        title: 'My page 2',
-        value: 'http://www.moxiecode.com'
-      }
-    ],
-    image_list: [{
-        title: 'My page 1',
-        value: 'https://www.tiny.cloud'
-      },
-      {
-        title: 'My page 2',
-        value: 'http://www.moxiecode.com'
-      }
-    ],
-    image_class_list: [{
-        title: 'None',
-        value: ''
-      },
-      {
-        title: 'Some class',
-        value: 'class-name'
-      }
-    ],
-    importcss_append: true,
-    file_picker_callback: (callback, value, meta) => {
-      /* Provide file and text for the link dialog */
-      if (meta.filetype === 'file') {
-        callback('https://www.google.com/logos/google.jpg', {
-          text: 'My text'
-        });
-      }
-
-      /* Provide image and alt text for the image dialog */
-      if (meta.filetype === 'image') {
-        callback('https://www.google.com/logos/google.jpg', {
-          alt: 'My alt text'
-        });
-      }
-
-      /* Provide alternative source and posted for the media dialog */
-      if (meta.filetype === 'media') {
-        callback('movie.mp4', {
-          source2: 'alt.ogg',
-          poster: 'https://www.google.com/logos/google.jpg'
-        });
-      }
-    },
-    templates: [{
-        title: 'New Table',
-        description: 'creates a new table',
-        content: '<div class="mceTmpl"><table width="98%%"  border="0" cellspacing="0" cellpadding="0"><tr><th scope="col"> </th><th scope="col"> </th></tr><tr><td> </td><td> </td></tr></table></div>'
-      },
-      {
-        title: 'Starting my story',
-        description: 'A cure for writers block',
-        content: 'Once upon a time...'
-      },
-      {
-        title: 'New list with dates',
-        description: 'New List with dates',
-        content: '<div class="mceTmpl"><span class="cdate">cdate</span><br><span class="mdate">mdate</span><h2>My List</h2><ul><li></li><li></li></ul></div>'
-      }
-    ],
-    template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
-    template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
-    height: 600,
-    image_caption: true,
-    quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-    noneditable_class: 'mceNonEditable',
-    toolbar_mode: 'sliding',
-    contextmenu: 'link image table',
-    skin: useDarkMode ? 'oxide-dark' : 'oxide',
-    content_css: useDarkMode ? 'dark' : 'default',
-    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
-  });
-
-  /**
-   * Initiate Bootstrap validation check
-   */
-  var needsValidation = document.querySelectorAll('.needs-validation')
-
-  Array.prototype.slice.call(needsValidation)
-    .forEach(function(form) {
-      form.addEventListener('submit', function(event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-
-        form.classList.add('was-validated')
-      }, false)
-    })
-
-  /**
-   * Initiate Datatables
-   */
-  const datatables = select('.datatable', true)
-  datatables.forEach(datatable => {
-    new simpleDatatables.DataTable(datatable, {
-      perPageSelect: [5, 10, 15, ["All", -1]],
-      columns: [{
-          select: 2,
-          sortSequence: ["desc", "asc"]
-        },
-        {
-          select: 3,
-          sortSequence: ["desc"]
-        },
-        {
-          select: 4,
-          cellClass: "green",
-          headerClass: "red"
-        }
-      ]
-    });
-  })
-
-  /**
-   * Autoresize echart charts
-   */
-  const mainContainer = select('#main');
-  if (mainContainer) {
-    setTimeout(() => {
-      new ResizeObserver(function() {
-        select('.echart', true).forEach(getEchart => {
-          echarts.getInstanceByDom(getEchart).resize();
-        })
-      }).observe(mainContainer);
-    }, 200);
-  }
-  
-
-})();
-
-
+/* =====================================
+========================================*/   
+/*=======================================
+[Start Activation Code]
+=========================================
+* Sticky Header JS
+* Search JS
+* Mobile Menu JS
+* Hero Slider JS
+* Testimonial Slider JS
+* Portfolio Slider JS
+* Clients Slider JS
+* Single Portfolio Slider JS
+* Accordion JS
+* Nice Select JS
+* Date Picker JS
+* Counter Up JS
+* Checkbox JS
+* Right Bar JS
+* Video Popup JS
+* Wow JS
+* Scroll Up JS
+* Animate Scroll JS
+* Stellar JS
+* Google Maps JS
+* Preloader JS
+=========================================
+[End Activation Code]
+=========================================*/
 (function($) {
-  "use strict";
-   $(document).on('ready', function() {
+    "use strict";
+     $(document).on('ready', function() {
+	
+        jQuery(window).on('scroll', function() {
+			if ($(this).scrollTop() > 200) {
+				$('#header .header-inner').addClass("sticky");
+			} else {
+				$('#header .header-inner').removeClass("sticky");
+			}
+		});
+		
+		/*====================================
+			Sticky Header JS
+		======================================*/ 
+		jQuery(window).on('scroll', function() {
+			if ($(this).scrollTop() > 100) {
+				$('.header').addClass("sticky");
+			} else {
+				$('.header').removeClass("sticky");
+			}
+		});
+		
+		$('.pro-features .get-pro').on( "click", function(){
+			$('.pro-features').toggleClass('active');
+		});
+		
+		/*====================================
+			Search JS
+		======================================*/ 
+		$('.search a').on( "click", function(){
+			$('.search-top').toggleClass('active');
+		});
+		
+		/*====================================
+			Mobile Menu
+		======================================*/ 	
+		$('.menu').slicknav({
+			prependTo:".mobile-nav",
+			duration: 300,
+			closeOnClick:true,
+		});
+		
+		/*===============================
+			Hero Slider JS
+		=================================*/ 
+		$(".hero-slider").owlCarousel({
+			loop:true,
+			autoplay:true,
+			smartSpeed: 500,
+			autoplayTimeout:3500,
+			singleItem: true,
+			autoplayHoverPause:true,
+			items:1,
+			nav:true,
+			navText: ['<i class="fa fa-angle-left" aria-hidden="true"></i>', '<i class="fa fa-angle-right" aria-hidden="true"></i>'],
+			dots:false,
+		});
 
-      $(".school-slick").slick(
-        {
-        infinite: true,
-        centerMode: false,
-        autoplay: true,
-        slidesToShow: 4,
-        slidesToScroll: 2,
-        autoplaySpeed: 2000,
-        // the magic
-        responsive: [
-          {
+		/*===============================
+			Testimonial Slider JS
+		=================================*/ 
+		$('.testimonial-slider').owlCarousel({
+			items:3,
+			autoplay:true,
+			autoplayTimeout:4500,
+			smartSpeed:300,
+			autoplayHoverPause:true,
+			loop:true,
+			merge:true,
+			nav:false,
+			dots:true,
+			responsive:{
+				1: {
+					items:1,
+				},
+				300: {
+					items:1,
+				},
+				480: {
+					items:1,
+				},
+				768: {
+					items:2,
+				},
+				1170: {
+					items:3,
+				},
+			}
+		});
+	
+		/*===============================
+			Portfolio Slider JS And Schools Cards Slider JS
+		=================================*/
 
-            breakpoint:1440,
-            settings: {
-            slidesToShow:4
-            }
+	    $("#carousel-slick").slick({
+	        infinite: true,
+	        centerMode: true,
+	        autoplay:true,
+	        slidesToShow: 5,
+	        slidesToScroll: 2,
+	        autoplaySpeed:2000,
+	        // the magic
+			responsive: [
+				{
 
-          },
-          {
+					breakpoint:1440,
+					settings: {
+					slidesToShow:3
+					}
 
-            breakpoint: 1024,
-            settings: {
-            slidesToShow:3,
-            
-            }
+				},
+				{
 
-          }, 
-          {
+					breakpoint: 1024,
+					settings: {
+					slidesToShow:3,
+					
+					}
 
-            breakpoint:991,
-            settings: {
-            slidesToShow:2,
-            centerMode:false,
-            }
+				}, 
+				{
 
-          },
-          {
+					breakpoint:991,
+					settings: {
+					slidesToShow:2,
+					centerMode:false,
+					}
 
-            breakpoint:767,
-            settings: {
-            slidesToShow:1,
-            }
+				},
+				{
 
-          }
-        ]
-      });
+					breakpoint:767,
+					settings: {
+					slidesToShow:1,
+					}
 
-      $(".school-slick-home-student").slick(
-        {
-        infinite: true,
-        centerMode: false,
-        autoplay: true,
-        slidesToShow: 3,
-        slidesToScroll: 2,
-        autoplaySpeed: 2000,
-        // the magic
-        responsive: [
-          {
+				}
+			]
+	    });
 
-            breakpoint:1440,
-            settings: {
-            slidesToShow:3
-            }
+		$(".school-slick").slick({
+	        infinite: true,
+	        centerMode: false,
+	        autoplay: true,
+	        slidesToShow: 4,
+	        slidesToScroll: 2,
+	        autoplaySpeed:2000,
+	        // the magic
+			responsive: [
+				{
 
-          },
-          {
+					breakpoint:1440,
+					settings: {
+					slidesToShow:4
+					}
 
-            breakpoint: 1024,
-            settings: {
-            slidesToShow:3,
-            
-            }
+				},
+				{
 
-          }, 
-          {
+					breakpoint: 1024,
+					settings: {
+					slidesToShow:3,
+					
+					}
 
-            breakpoint:991,
-            settings: {
-            slidesToShow:2,
-            centerMode:false,
-            }
+				}, 
+				{
 
-          },
-          {
+					breakpoint:991,
+					settings: {
+					slidesToShow:2,
+					centerMode:false,
+					}
 
-            breakpoint:767,
-            settings: {
-            slidesToShow:1,
-            }
+				},
+				{
 
-          }
-        ]
-      });
+					breakpoint:767,
+					settings: {
+					slidesToShow:1,
+					}
 
-      $(".slick-cursos").slick(
-        {
-        infinite: true,
-        centerMode: false,
-        autoplay: true,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        autoplaySpeed: 2000,
-        
-      });
+				}
+			]
+	    });
+		
+		/*=====================================
+			Counter Up JS
+		======================================*/
+		$('.counter').counterUp({
+			delay:20,
+			time:2000
+		});
+		
+		/*===============================
+			Clients Slider JS
+		=================================*/ 
+		$('.clients-slider').owlCarousel({
+			items:5,
+			autoplay:true,
+			autoplayTimeout:3500,
+			margin:15,
+			smartSpeed: 400,
+			autoplayHoverPause:true,
+			loop:true,
+			nav:false,
+			dots:false,
+			responsive:{
+				300: {
+					items:1,
+				},
+				480: {
+					items:2,
+				},
+				768: {
+					items:3,
+				},
+				1170: {
+					items:5,
+				},
+			}
+		});
+		
+		/*====================================
+			Single Portfolio Slider JS
+		======================================*/ 
+		$('.pf-details-slider').owlCarousel({
+			items:1,
+			autoplay:false,
+			autoplayTimeout:5000,
+			smartSpeed: 400,
+			autoplayHoverPause:true,
+			loop:true,
+			merge:true,
+			nav:true,
+			dots:false,
+			navText: ['<i class="icofont-rounded-left"></i>', '<i class="icofont-rounded-right"></i>'],
+		});
+		
+		/*===================
+			Accordion JS
+		=====================*/ 
+		$('.accordion > li:eq(0) a').addClass('active').next().slideDown();
+		$('.accordion a').on('click', function(j) {
+			var dropDown = $(this).closest('li').find('p');
+			$(this).closest('.accordion').find('p').not(dropDown).slideUp(300);
+			if ($(this).hasClass('active')) {
+				$(this).removeClass('active');
+			} else {
+				$(this).closest('.accordion').find('a.active').removeClass('active');
+				$(this).addClass('active');
+			}
+			dropDown.stop(false, true).slideToggle(300);
+			j.preventDefault();
+		});
+		
+		/*=====================================
+			Date Picker JS
+		======================================*/ 
+		$( function() {
+			$( "#datepicker" ).datepicker();
+		} );
+		
+		
+		
+		/*===============================
+			Checkbox JS
+		=================================*/  
+		$('input[type="checkbox"]').change(function(){
+			if($(this).is(':checked')){
+				$(this).parent("label").addClass("checked");
+			} else {
+				$(this).parent("label").removeClass("checked");
+			}
+		});
+		
+		/*===============================
+			Right Bar JS
+		=================================*/ 
+		$('.right-bar .bar').on( "click", function(){
+			$('.sidebar-menu').addClass('active');
+		});
+		$('.sidebar-menu .cross').on( "click", function(){
+			$('.sidebar-menu').removeClass('active');
+		});
+		
+		/*=====================
+			Video Popup JS
+		=======================*/ 
+		$('.video-popup').magnificPopup({
+			type: 'video',	
+		});
+		
+		/*================
+			Wow JS
+		==================*/		
+		var window_width = $(window).width();   
+			if(window_width > 767){
+            new WOW().init();
+		}
+	
+		/*===================
+			Scroll Up JS
+		=====================*/
+		$.scrollUp({
+			scrollText: '<span><i class="fa fa-angle-up"></i></span>',
+			easingType: 'easeInOutExpo',
+			scrollSpeed: 900,
+			animation: 'fade'
+		}); 
 
-   });
+		/*=======================
+			Animate Scroll JS
+		=========================*/
+		$('.scroll').on("click", function (e) {
+			var anchor = $(this);
+				$('html, body').stop().animate({
+					scrollTop: $(anchor.attr('href')).offset().top - 100
+				}, 1000);
+			e.preventDefault();
+		});
+		
+		/*=======================
+			Stellar JS
+		=========================*/
+		$.stellar({
+		  horizontalOffset: 0,
+		  verticalOffset: 0
+		});
+
+		/*====================
+			Google Maps JS
+		======================*/
+		var map = new GMaps({
+				el: '#map',
+				lat: 23.011245,
+				lng: 90.884780,
+				scrollwheel: false,
+			});
+			map.addMarker({
+				lat: 23.011245,
+				lng: 90.884780,
+				title: 'Marker with InfoWindow',
+				infoWindow: {
+				content: '<p>Bem-vindo ao SUIEA</p>'
+			}
+		
+		});
+	});
+	
+	/*====================
+		Preloader JS
+	======================*/
+	$(window).on('load', function() {
+		$('.preloader').addClass('preloader-deactivate');
+	});
+	
+	
 })(jQuery);
+
+/*====================
+		Ease Scroll JS
+	======================*/
+
+	$(document).ready(function() {
+		// Adiciona rolagem suave a todos os links de ancoragem
+		$('a[href^="#"]').on('click', function(event) {
+		  var target = $($(this).attr('href'));
+	  
+		  if (target.length) {
+			event.preventDefault();
+			$('html, body').animate({
+			  scrollTop: target.offset().top
+			}, 1500);
+		  }
+		});
+	  });
+	
+	  
